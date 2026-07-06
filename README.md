@@ -70,22 +70,7 @@ A few decisions and issues worth flagging:
 - **Dividend yield.** Ignoring dividends biases IV systematically low, with the error growing toward ITM strikes (higher delta → more sensitivity to the forward level). `yfinance`'s `.info['dividendYield']` field returned a corrupted value, so `q` is set from the known SPY yield rather than trusting a fragile derived field.
 - **Mid price over last trade.** The last trade can be stale for illiquid strikes; the bid–ask mid reflects live quotes and yields cleaner IVs.
 - **Grid sparsity.** Maturities don't list identical strikes, so the pivoted grid is sparse. Strikes present in fewer than half the maturities are dropped; remaining interior gaps are linearly interpolated (no extrapolation past observed data).
----
 
-## Usage
-
-```python
-# build the surface data (samples maturities from ~1 week to ~2 years)
-surface_df = build_surface_data("SPY", max_expiries=8)
-
-# pivot to a maturity × strike grid and clean gaps
-grid = surface_df.pivot_table(index='T', columns='strike', values='iv', aggfunc='mean')
-grid = grid.dropna(axis=1, thresh=grid.shape[0] // 2)
-grid = grid.interpolate(axis=1, method='linear', limit_area='inside')
-
-# plot (see notebook for matplotlib + plotly versions)
-plot_surface(grid, "SPY")
-```
 ---
 
 ## Possible extensions
