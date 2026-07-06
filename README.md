@@ -4,7 +4,7 @@ A 3D implied volatility surface built from real options market data. The project
 
 Built as an extension of a Black–Scholes / Monte Carlo option pricer, this project focuses on the inverse problem: given the *price*, recover the *volatility* the market is using.
 
-![Implied volatility surface](surface.png)
+<img width="832" height="698" alt="image" src="https://github.com/user-attachments/assets/b41f8248-df54-4b95-9ab5-c7d03cb7b4d4" />
 
 ---
 
@@ -16,8 +16,6 @@ If Black–Scholes were a perfect model, every option on the same underlying wou
 
 - **Skew** — variation across strikes at fixed maturity. Equity-index surfaces slope upward toward low strikes: OTM puts trade at higher IV than OTM calls, reflecting the market's demand for crash protection.
 - **Term structure** — variation across maturities at fixed strike. Typically upward-sloping in calm markets as uncertainty accumulates over longer horizons.
-
-That shape is precisely what a single Black–Scholes volatility fails to describe, which is what makes the surface worth building.
 
 ---
 
@@ -33,7 +31,7 @@ The pipeline runs in five stages:
 
 ### Solving for implied volatility
 
-σ cannot be isolated algebraically from Black–Scholes (it sits inside `d1`, `d2`, and the normal CDF), so IV is found numerically. Because the Black–Scholes price is **monotonically increasing in σ**, the root is unique and bracketed, making bisection a robust choice: it is derivative-free and always converges given a sign change — unlike Newton–Raphson, which can diverge when vega is near zero (deep ITM/OTM or very short-dated contracts).
+σ cannot be isolated algebraically from Black–Scholes (it sits inside `d1`, `d2`, and the normal CDF), so IV is found numerically. Because the Black–Scholes price is **monotonically increasing in σ**, the root is unique and bracketed, making bisection a robust choice: it is derivative-free and always converges given a sign change.
 
 ```python
 def implied_vol(market_price, S, K, T, r, q, option_type='call', tol=1e-6):
@@ -69,18 +67,12 @@ OTM contracts carry more time value relative to their bid–ask spread, so their
 
 A few decisions and issues worth flagging:
 
-- **Dividend yield.** Ignoring dividends biases IV systematically low, with the error growing toward ITM strikes (higher delta → more sensitivity to the forward level). `yfinance`'s `.info['dividendYield']` field returned a corrupted value, so `q` is set from the known SPY yield rather than trusting a fragile derived field — a reminder to validate third-party data fields against sanity checks.
+- **Dividend yield.** Ignoring dividends biases IV systematically low, with the error growing toward ITM strikes (higher delta → more sensitivity to the forward level). `yfinance`'s `.info['dividendYield']` field returned a corrupted value, so `q` is set from the known SPY yield rather than trusting a fragile derived field.
 - **Mid price over last trade.** The last trade can be stale for illiquid strikes; the bid–ask mid reflects live quotes and yields cleaner IVs.
 - **Grid sparsity.** Maturities don't list identical strikes, so the pivoted grid is sparse. Strikes present in fewer than half the maturities are dropped; remaining interior gaps are linearly interpolated (no extrapolation past observed data).
-- **`yfinance` fragility.** As an unofficial scraper, `yfinance` breaks when Yahoo changes its backend, and bid/ask quotes are zero outside market hours. Running during US market hours (or against a saved snapshot) is required for valid data.
-
 ---
 
 ## Usage
-
-```bash
-pip install yfinance numpy pandas scipy matplotlib plotly
-```
 
 ```python
 # build the surface data (samples maturities from ~1 week to ~2 years)
@@ -94,14 +86,7 @@ grid = grid.interpolate(axis=1, method='linear', limit_area='inside')
 # plot (see notebook for matplotlib + plotly versions)
 plot_surface(grid, "SPY")
 ```
-
-> **Note:** requires access to Yahoo Finance and should be run during US market hours for live bid/ask quotes.
-
 ---
-
-## Tech stack
-
-`Python` · `NumPy` · `pandas` · `SciPy` · `yfinance` · `matplotlib` · `plotly`
 
 ## Possible extensions
 
