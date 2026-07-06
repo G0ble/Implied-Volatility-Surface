@@ -4,7 +4,8 @@ A 3D implied volatility surface built from real options market data. The project
 
 Built as an extension of a Black–Scholes / Monte Carlo option pricer, this project focuses on the inverse problem: given the *price*, recover the *volatility* the market is using.
 
-<img width="832" height="698" alt="image" src="https://github.com/user-attachments/assets/b41f8248-df54-4b95-9ab5-c7d03cb7b4d4" />
+<img width="827" height="706" alt="image" src="https://github.com/user-attachments/assets/04c8fe4b-3a0e-4b86-ba63-20b7abdcbe47" />
+
 
 ---
 
